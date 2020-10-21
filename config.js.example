@@ -1,0 +1,5 @@
+module.exports = {
+  token: 'YOUR TOKEN GOES HERE',
+  lang: 'en',
+  speed: 1
+}

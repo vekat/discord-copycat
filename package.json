@@ -1,0 +1,18 @@
+{
+  "name": "discord-copycat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "discord.js": "^12.4.0",
+    "ffmpeg-static": "^4.2.7",
+    "google-tts-api": "0.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vitor Cortez <vitor.a.cortez@gmail.com>",
+  "license": "ISC"
+}
