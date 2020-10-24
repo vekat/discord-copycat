@@ -1,5 +1,7 @@
 module.exports = {
   token: 'YOUR TOKEN GOES HERE',
   lang: 'en',
-  speed: 1
+  speed: 1,
+  vlcPath: 'PATH TO VLC EXECUTABLE',
+  vlcArgs: ['-I', 'dummy', '--dummy-quiet', '--play-and-exit', '-']
 }

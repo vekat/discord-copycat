@@ -2,13 +2,13 @@ const fs = require('fs')
 
 const Discord = require('discord.js')
 const tts = require('google-tts-api')
+const spawn = require('child_process').spawn
 
 const config = require('./config')
 
 const client = new Discord.Client()
 
 const state = {
-  connection: null,
   memberId: 0,
   channelId: 0,
 }
@@ -36,32 +36,22 @@ async function handleJoin(args, message) {
   if (!memberId)
     return message.reply('invalid user')
 
-  if (!message.member.voice.channel)
-    return message.reply('join a vc')
-
-  try {
-    state.connection = await message.member.voice.channel.join()
-    state.memberId = memberId
-    state.channelId = message.channel.id
-  } catch (err) {
-    return message.reply('error, check my permissions')
-  }
+  state.memberId = memberId
+  state.channelId = message.channel.id
 
   return message.reply('copy')
 }
 
 async function handleStop(args, message) {
-  if (state.connection) {
+  if (state.memberId) {
     state.memberId = state.channelId = 0
-    await state.connection.disconnect()
-    state.connection = null
   }
 
   return message.reply('done')
 }
 
 async function handleMessage(args, message) {
-  if (state.connection && message.author.id == state.memberId && message.channel.id == state.channelId) {
+  if (message.author.id == state.memberId && message.channel.id == state.channelId) {
     const content = message.content.replace(/<\w*:(\w+):\d+>/g, '$1').replace(/(?:[\w]{2,8}:\/\/)?([-\w@.]{2,256}\.[\w]{2,4})\b(\/[-\w@:%_\+.~#?&/=]*)?/g, '$1$2')
     
     let url
@@ -75,7 +65,11 @@ async function handleMessage(args, message) {
       }
     }
 
-    await state.connection.play(url)
+    const child = spawn(config.vlcPath, config.vlcArgs, { stdio: ['pipe', process.stdout, process.stderr] })
+    fetch(url)
+      .then((res) => res.body)
+      .then((stream) => stream.pipe(child.stdin))
+      .catch((err) => console.error(err))
   }
 }
 
