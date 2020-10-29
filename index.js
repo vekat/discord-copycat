@@ -5,7 +5,7 @@ const tts = require('google-tts-api')
 
 const config = require('./config')
 
-const client = new Discord.Client();
+const client = new Discord.Client()
 
 const state = {
   connection: null,
@@ -20,12 +20,12 @@ client.on('ready', async () => {
 client.on('message', async (message) => {
   if (!message.guild) return
 
-  const args = message.content.split(/\s+/)
+  const args = message.cleanContent.split(/\s+/)
 
   switch (args.shift()) {
     case '+join': return await handleJoin(args, message)
-    case '+stop': return await handleStop()
-    default: return await handleMessage(message)
+    case '+stop': return await handleStop(args, message)
+    default: return await handleMessage(args, message)
   }
 })
 
@@ -50,19 +50,21 @@ async function handleJoin(args, message) {
   return message.reply('copy')
 }
 
-async function handleStop() {
+async function handleStop(args, message) {
   if (state.connection) {
     state.memberId = state.channelId = 0
     await state.connection.disconnect()
     state.connection = null
   }
+
+  return message.reply('done')
 }
 
-async function handleMessage(message) {
+async function handleMessage(args, message) {
   if (state.connection && message.author.id == state.memberId && message.channel.id == state.channelId) {
-    const content = message.cleanContent.replace(/<:(\w+):\d+>/g, '$1')
+    const content = args.join(' ').replace(/<\w+:(\w+):\d+>/g, '$1')
     const url = await tts(content, config.lang, config.speed)
-    state.connection.play(url)
+    await state.connection.play(url)
   }
 }
 
