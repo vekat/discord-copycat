@@ -20,7 +20,7 @@ client.on('ready', async () => {
 client.on('message', async (message) => {
   if (!message.guild) return
 
-  const args = message.cleanContent.split(/\s+/)
+  const args = message.content.split(/\s+/)
 
   switch (args.shift()) {
     case '+join': return await handleJoin(args, message)
@@ -62,7 +62,7 @@ async function handleStop(args, message) {
 
 async function handleMessage(args, message) {
   if (state.connection && message.author.id == state.memberId && message.channel.id == state.channelId) {
-    const content = args.join(' ').replace(/<\w+:(\w+):\d+>/g, '$1').replace(/(?:[\w]{2,8}:\/\/)?([-\w@.]{2,256}\.[\w]{2,4})\b(\/[-\w@:%_\+.~#?&/=]*)?/g, '$1$2')
+    const content = message.content.replace(/<\w+:(\w+):\d+>/g, '$1').replace(/(?:[\w]{2,8}:\/\/)?([-\w@.]{2,256}\.[\w]{2,4})\b(\/[-\w@:%_\+.~#?&/=]*)?/g, '$1$2')
     const url = await tts(content, config.lang, config.speed)
     await state.connection.play(url)
   }
